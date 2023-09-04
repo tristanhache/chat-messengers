@@ -1,12 +1,17 @@
-from flask import Flask, render_template, redirect, url_for, request
+from flask import Flask, render_template, request, redirect, url_for
+from flask_socketio import SocketIO, send
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 
 app = Flask(__name__)
-app.secret_key = 'your_secret_key'  # Replace with a secure secret key
+app.config['SECRET_KEY'] = 'your_secret_key'
+socketio = SocketIO(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 
+# List to store chat messages
+chat_history = []
 
+# Sample user data (for demonstration purposes)
 users = {
     'tristanhache2009@gmail.com': {'password': 'trust'},
     'user2@example.com': {'password': 'password2'}
@@ -21,24 +26,21 @@ class User(UserMixin):
 def load_user(user_id):
     return User(user_id)
 
-@app.route("/")
+@app.route('/')
+@login_required
 def index():
-    if current_user.is_authenticated:
-        return render_template("index.html", username=current_user.id)
-    return redirect(url_for('login'))
+    return render_template('index.html', username=current_user.id)
 
-@app.route("/login", methods=["GET", "POST"])
+@app.route('/login', methods=['GET', 'POST'])
 def login():
-    if request.method == "POST":
-        email = request.form.get("email")
-        password = request.form.get("password")
+    if request.method == 'POST':
+        email = request.form.get('email')
+        password = request.form.get('password')
         if email in users and users[email]['password'] == password:
             user = User(email)
             login_user(user)
-            print(f"Logged in as {email}")  # Add this line for debugging
             return redirect(url_for('index'))
-    return render_template("login.html")
-
+    return render_template('login.html')
 
 @app.route('/logout')
 @login_required
@@ -46,5 +48,12 @@ def logout():
     logout_user()
     return redirect(url_for('login'))
 
-if __name__ == "__main__":
-    app.run(debug=True)
+@socketio.on('message')
+def handle_message(data):
+    message = data['message']
+    user = data['user']
+    chat_history.append({'user': user, 'message': message})
+    send({'user': user, 'message': message}, broadcast=True)
+
+if __name__ == '__main__':
+    socketio.run(app, debug=True)
