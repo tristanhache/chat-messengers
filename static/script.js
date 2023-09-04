@@ -2,50 +2,49 @@ document.addEventListener("DOMContentLoaded", function() {
     var socket = io.connect('http://' + document.domain + ':' + location.port);
     var username = "{{ username }}"; // Get the username from the rendered template
 
-    // Handle login form submission
-    var loginForm = document.getElementById('login-form');
-    if (loginForm) {
-        loginForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            var usernameInput = document.getElementById('username');
-            var passwordInput = document.getElementById('password');
+    // Function to add a new message to the chat
+    function addMessage(user, message) {
+        var messages = document.getElementById('messages');
+        var li = document.createElement('li');
+        li.innerHTML = '<b>' + user + '</b>: ' + message;
+        messages.appendChild(li);
 
-            // Send a login event to the server
-            socket.emit('login', { username: usernameInput.value, password: passwordInput.value });
+        // Store the message in local storage
+        var chatHistory = JSON.parse(localStorage.getItem('chatHistory')) || [];
+        chatHistory.push({ user: user, message: message });
+        localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
+    }
 
-            // Clear the form
-            usernameInput.value = '';
-            passwordInput.value = '';
+    // Retrieve and display chat history from local storage
+    function displayChatHistory() {
+        var chatHistory = JSON.parse(localStorage.getItem('chatHistory')) || [];
+        chatHistory.forEach(function(entry) {
+            addMessage(entry.user, entry.message);
         });
     }
 
-    
+    // Handle sending messages
+    var messageForm = document.getElementById('message-form');
+    if (messageForm) {
+        messageForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            var messageInput = document.getElementById('message');
+            var message = messageInput.value;
+            if (message.trim() !== '') {
+                // Display the message immediately
+                addMessage(username, message);
+                // Send the message to the server
+                socket.emit('message', { message: message });
+                messageInput.value = '';
+            }
+        });
+    }
 
-    // Handle message sending
-    var messageInput = document.getElementById('message');
-    var sendButton = document.getElementById('send-button');
-
-    sendButton.addEventListener('click', function() {
-        var message = messageInput.value;
-        if (message.trim() !== '') {
-            socket.emit('message', { message: message, user: username });
-            messageInput.value = '';
-        }
-    });
-
-    // Handle incoming messages
+    // Handle receiving messages from the server
     socket.on('message', function(data) {
-        var messageList = document.getElementById('messages');
-        var li = document.createElement('li');
-        li.textContent = data.user + ': ' + data.message;
-        messageList.appendChild(li);
+        addMessage(data.user, data.message);
     });
 
-    // Handle login success
-    socket.on('login_success', function() {
-        var loginContainer = document.getElementById('login-container');
-        if (loginContainer) {
-            loginContainer.style.display = 'none';
-        }
-    });
+    // Initialize by displaying chat history from local storage
+    displayChatHistory();
 });
