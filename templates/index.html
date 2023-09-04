@@ -4,8 +4,29 @@
     <title>Chat Messenger</title>
 </head>
 <body>
-    <h1>Chat Messenger</h1>
-    <p>Welcome, <strong>{{ username }}</strong>! <a href="/logout">Logout</a></p>
-    <!-- Your chat interface here -->
+    <div id="chat">
+        <ul id="messages"></ul>
+    </div>
+    <input id="message_input" autocomplete="off" /><button onclick="sendMessage()">Send</button>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script>
+        var socket = io.connect('http://' + document.domain + ':' + location.port);
+
+        function sendMessage() {
+            var message = document.getElementById('message_input').value;
+            var user = prompt("Enter your username:");
+            if (message && user) {
+                socket.emit('message', { message: message, user: user });
+                document.getElementById('message_input').value = '';
+            }
+        }
+
+        socket.on('message', function(data) {
+            var messageList = document.getElementById('messages');
+            var li = document.createElement('li');
+            li.textContent = data.user + ': ' + data.message;
+            messageList.appendChild(li);
+        });
+    </script>
 </body>
 </html>
