@@ -1,32 +1,32 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat Messenger</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <div id="chat">
-        <ul id="messages"></ul>
+    <div id="chat-container">
+        <div id="user-list">
+            <h2>Online Users</h2>
+            <ul id="users">
+                <!-- User list will be dynamically updated here -->
+            </ul>
+        </div>
+        <div id="chat">
+            <div id="message-box">
+                <ul id="messages">
+                    <!-- Chat messages will be displayed here -->
+                </ul>
+            </div>
+            <div id="message-input">
+                <input type="text" id="message" autocomplete="off" placeholder="Type your message...">
+                <button id="send-button">Send</button>
+            </div>
+        </div>
     </div>
-    <input id="message_input" autocomplete="off" /><button onclick="sendMessage()">Send</button>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
-    <script>
-        var socket = io.connect('http://' + document.domain + ':' + location.port);
-
-        function sendMessage() {
-            var message = document.getElementById('message_input').value;
-            var user = prompt("Enter your username:");
-            if (message && user) {
-                socket.emit('message', { message: message, user: user });
-                document.getElementById('message_input').value = '';
-            }
-        }
-
-        socket.on('message', function(data) {
-            var messageList = document.getElementById('messages');
-            var li = document.createElement('li');
-            li.textContent = data.user + ': ' + data.message;
-            messageList.appendChild(li);
-        });
-    </script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
