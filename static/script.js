@@ -19,6 +19,8 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
+    
+
     // Handle message sending
     var messageInput = document.getElementById('message');
     var sendButton = document.getElementById('send-button');

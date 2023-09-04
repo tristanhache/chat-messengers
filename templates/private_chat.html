@@ -3,29 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat Messenger</title>
+    <title>Private Chat - {{ room_name }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
+    <h1>Private Chat - {{ room_name }}</h1>
     <div id="chat-container">
-        <div id="user-list">
-            <h2>Online Users</h2>
-            <ul id="users">
-                <!-- User list will be dynamically updated here -->
+        <div id="message-box">
+            <ul id="messages">
+                <!-- Chat messages will be displayed here -->
             </ul>
         </div>
-        <div id="chat">
-            <div id="message-box">
-                <ul id="messages">
-                    <!-- Chat messages will be displayed here -->
-                </ul>
-            </div>
-            <div id="message-input">
+        <div id="message-input">
+            <form id="private-chat-form" data-room="{{ room_name }}">
                 <input type="text" id="message" autocomplete="off" placeholder="Type your message...">
                 <button id="send-button">Send</button>
-            </div>
+            </form>
         </div>
     </div>
+    <button class="leave-room" data-room="{{ room_name }}">Leave Room</button>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
