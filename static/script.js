@@ -9,10 +9,10 @@ document.addEventListener("DOMContentLoaded", function() {
             e.preventDefault();
             var usernameInput = document.getElementById('username');
             var passwordInput = document.getElementById('password');
-            
+
             // Send a login event to the server
             socket.emit('login', { username: usernameInput.value, password: passwordInput.value });
-            
+
             // Clear the form
             usernameInput.value = '';
             passwordInput.value = '';
@@ -37,5 +37,13 @@ document.addEventListener("DOMContentLoaded", function() {
         var li = document.createElement('li');
         li.textContent = data.user + ': ' + data.message;
         messageList.appendChild(li);
+    });
+
+    // Handle login success
+    socket.on('login_success', function() {
+        var loginContainer = document.getElementById('login-container');
+        if (loginContainer) {
+            loginContainer.style.display = 'none';
+        }
     });
 });
