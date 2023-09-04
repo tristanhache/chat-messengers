@@ -1,28 +1,21 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Private Chat - {{ room_name }}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Private Chat</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <h1>Private Chat - {{ room_name }}</h1>
-    <div id="chat-container">
-        <div id="message-box">
-            <ul id="messages">
-                <!-- Chat messages will be displayed here -->
-            </ul>
+    <div id="private-chat-container">
+        <h1>Private Chat Room</h1>
+        <div id="message-container">
+            <ul id="messages"></ul>
         </div>
-        <div id="message-input">
-            <form id="private-chat-form" data-room="{{ room_name }}">
-                <input type="text" id="message" autocomplete="off" placeholder="Type your message...">
-                <button id="send-button">Send</button>
-            </form>
-        </div>
+        <input id="private-message-input" autocomplete="off" placeholder="Type your private message...">
+        <button id="private-send-button">Send</button>
+        <a href="/">Back to Chat</a>
     </div>
-    <button class="leave-room" data-room="{{ room_name }}">Leave Room</button>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.3.1/socket.io.js"></script>
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
+

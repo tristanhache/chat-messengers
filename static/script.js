@@ -1,50 +1,58 @@
-document.addEventListener("DOMContentLoaded", function() {
-    var socket = io.connect('http://' + document.domain + ':' + location.port);
-    var username = "{{ username }}"; // Get the username from the rendered template
+document.addEventListener('DOMContentLoaded', () => {
+    const socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
 
-    // Function to add a new message to the chat
-    function addMessage(user, message) {
-        var messages = document.getElementById('messages');
-        var li = document.createElement('li');
-        li.innerHTML = '<b>' + user + '</b>: ' + message;
-        messages.appendChild(li);
+    const username = document.querySelector('#username').textContent;
 
-        // Store the message in local storage
-        var chatHistory = JSON.parse(localStorage.getItem('chatHistory')) || [];
-        chatHistory.push({ user: user, message: message });
-        localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
+    // Function to add a message to the chat
+    function addMessage(username, message) {
+        const ul = document.querySelector('#messages');
+        const li = document.createElement('li');
+        li.innerHTML = `<strong>${username}:</strong> ${message}`;
+        ul.appendChild(li);
     }
 
-    // Retrieve and display chat history from local storage
-    function displayChatHistory() {
-        var chatHistory = JSON.parse(localStorage.getItem('chatHistory')) || [];
-        chatHistory.forEach(function(entry) {
-            addMessage(entry.user, entry.message);
-        });
+    // Function to send a message
+    function sendMessage() {
+        const messageInput = document.querySelector('#message-input');
+        const message = messageInput.value.trim();
+
+        if (message !== '') {
+            socket.emit('message', { message: message });
+            messageInput.value = '';
+        }
     }
 
-    // Handle sending messages
-    var messageForm = document.getElementById('message-form');
-    if (messageForm) {
-        messageForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            var messageInput = document.getElementById('message');
-            var message = messageInput.value;
-            if (message.trim() !== '') {
-                // Display the message immediately
-                addMessage(username, message);
-                // Send the message to the server
-                socket.emit('message', { message: message });
-                messageInput.value = '';
-            }
-        });
-    }
-
-    // Handle receiving messages from the server
-    socket.on('message', function(data) {
-        addMessage(data.user, data.message);
+    // Event listener for sending messages
+    document.querySelector('#send-button').addEventListener('click', () => {
+        sendMessage();
     });
 
-    // Initialize by displaying chat history from local storage
-    displayChatHistory();
+    // Event listener for pressing Enter to send a message
+    document.querySelector('#message-input').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    });
+
+    // Event listener for receiving messages
+    socket.on('message', (data) => {
+        const { user, message } = data;
+        addMessage(user, message);
+    });
+
+    // Event listener for updating the user list
+    socket.on('update_user_list', (data) => {
+        const userList = data.users;
+        console.log(userList); // You can update the user list UI here
+    });
+
+    // Event listener for initial messages
+    socket.on('connect', () => {
+        socket.emit('connect');
+    });
+
+    // Event listener for private messages
+    socket.on('private_message', (data) => {
+        // Handle private messages if needed
+    });
 });

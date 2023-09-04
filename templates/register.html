@@ -1,22 +1,22 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Login</title>
+    <title>Registration</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <div id="login-container">
-        <h1>Login</h1>
-        <form method="POST" action="/login">
+    <div id="register-container">
+        <h1>Registration</h1>
+        <form method="POST" action="/register">
             <label for="username">Username:</label>
             <input type="text" id="username" name="username" required><br>
 
             <label for="password">Password:</label>
             <input type="password" id="password" name="password" required><br>
 
-            <input type="submit" value="Login">
+            <input type="submit" value="Register">
         </form>
-        <p>Don't have an account? <a href="/register">Register here</a></p>
+        <p>Already have an account? <a href="/login">Login here</a></p>
     </div>
 </body>
 </html>
